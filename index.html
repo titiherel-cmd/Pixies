@@ -156,7 +156,7 @@
 
   .player-score-card {
     background: var(--surface); border-radius: var(--radius);
-    padding: 16px; box-shadow: var(--shadow);
+    padding: clamp(10px, 3vw, 16px); box-shadow: var(--shadow);
     border: 2px solid transparent; transition: border-color 0.15s;
   }
 
@@ -169,30 +169,36 @@
     font-weight: 800; font-size: 1.1rem; color: var(--gold);
   }
 
-  .score-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .score-inputs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
 
-  .score-field { display: flex; flex-direction: column; gap: 4px; }
+  .score-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 
   .score-label {
-    font-size: 0.72rem; color: var(--muted); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.07em;
-    display: flex; align-items: center; gap: 4px;
+    font-size: clamp(0.6rem, 2vw, 0.72rem); color: var(--muted); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    display: flex; align-items: center; gap: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
   /* Stepper input (+/-) */
   .stepper {
-    display: flex; align-items: center; gap: 0;
+    display: flex; align-items: center;
     background: var(--bg); border: 2px solid var(--card);
-    border-radius: 10px; overflow: hidden;
+    border-radius: 10px; overflow: hidden; width: 100%;
   }
   .stepper:focus-within { border-color: var(--accent); }
 
   .step-btn {
-    width: 34px; flex-shrink: 0;
+    flex: 0 0 clamp(28px, 8vw, 36px);
     background: none; border: none;
-    color: var(--muted); font-size: 1.2rem; font-weight: 800;
+    color: var(--muted); font-size: clamp(1rem, 3vw, 1.2rem); font-weight: 800;
     cursor: pointer; padding: 0;
-    height: 40px; display: flex; align-items: center; justify-content: center;
+    height: clamp(36px, 10vw, 44px);
+    display: flex; align-items: center; justify-content: center;
     transition: color 0.1s, background 0.1s;
     -webkit-tap-highlight-color: transparent;
   }
@@ -202,10 +208,10 @@
   .step-val {
     flex: 1; background: none; border: none;
     color: var(--text); font-family: 'Nunito', sans-serif;
-    font-size: 1.1rem; font-weight: 700;
+    font-size: clamp(0.9rem, 3vw, 1.1rem); font-weight: 700;
     text-align: center; outline: none;
     -moz-appearance: textfield; padding: 0;
-    min-width: 0;
+    min-width: 0; width: 100%;
   }
   .step-val::-webkit-inner-spin-button,
   .step-val::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -483,7 +489,7 @@ function buildPlayerCard(p, r) {
         ${stepper('spi', p, s.spirals,   '🌀', 'Spirales')}
         ${stepper('cro', p, s.crosses,   '✖️', 'Croix (−)')}
       </div>
-      <div style="margin-top:10px; max-width:160px">
+      <div style="margin-top:10px">
         ${stepper('zon', p, s.zone, '🎨', 'Zone de couleur')}
       </div>
       <div class="round-subtotal">Score manche : <span id="rsub-${p}">${s.validated !== '' ? calcRoundScore(toScore(s), r) : '—'}</span> pts</div>
