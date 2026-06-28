@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2d1b4e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Pixies — Score</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #1a0f2e;
+    --surface: #231540;
+    --card: #2d1b55;
+    --accent: #b06aff;
+    --accent2: #ff9ecd;
+    --gold: #ffd166;
+    --text: #f0e6ff;
+    --muted: #9580b8;
+    --blue: #5ba4ff;
+    --green: #58e09a;
+    --yellow: #ffe066;
+    --orange: #ff9a45;
+    --red: #ff5c7a;
+    --purple: #c67bff;
+    --brown: #c49a5a;
+    --multi: linear-gradient(135deg, #5ba4ff, #58e09a, #ffe066, #ff9a45, #ff5c7a, #c67bff);
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.8rem;
+    text-align: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Setup screen ── */
+  #setup-screen {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .setup-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .setup-card h2 {
+    font-size: 1rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .player-count-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .count-btn {
+    flex: 1;
+    padding: 10px;
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .count-btn:hover { border-color: var(--accent); }
+  .count-btn.active { border-color: var(--accent); background: rgba(176,106,255,0.2); color: var(--accent); }
+
+  .player-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+  .player-input-row { display: flex; align-items: center; gap: 10px; }
+
+  .player-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem; flex-shrink: 0;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: var(--bg);
+    border: 2px solid var(--card);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), #7c3aff);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* ── Game screen ── */
+  #game-screen { max-width: 600px; margin: 0 auto; }
+
+  .round-indicator {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .round-pip {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.9rem; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .round-pip.active { border-color: var(--accent); color: var(--accent); background: rgba(176,106,255,0.15); }
+  .round-pip.done { border-color: var(--gold); color: var(--gold); background: rgba(255,209,102,0.1); }
+
+  .round-label {
+    font-size: 0.85rem; color: var(--muted);
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* Player cards */
+  .players-grid {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .player-score-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .player-score-card.active-player { border-color: rgba(176,106,255,0.4); }
+
+  .player-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+
+  .player-name-display { font-weight: 800; font-size: 1rem; }
+
+  .total-badge {
+    margin-left: auto;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--gold);
+  }
+
+  .score-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .score-field { display: flex; flex-direction: column; gap: 4px; }
+
+  .score-label {
+    font-size: 0.72rem; color: var(--muted); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .score-label .icon { font-size: 0.9rem; }
+
+  .score-num-input {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--card);
+    border-radius: 10px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  .score-num-input::-webkit-inner-spin-button,
+  .score-num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .score-num-input:focus { border-color: var(--accent); }
+
+  .round-subtotal {
+    margin-top: 10px;
+    display: flex; justify-content: flex-end;
+    font-size: 0.85rem; color: var(--muted); font-weight: 600;
+  }
+  .round-subtotal span { color: var(--text); font-weight: 800; margin-left: 4px; }
+
+  /* Color zone hint */
+  .zone-hint {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.82rem; color: var(--muted);
+  }
+  .zone-hint strong { color: var(--accent); }
+
+  /* Action buttons */
+  .action-row {
+    display: flex; gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    padding: 12px;
+    background: var(--surface);
+    border: 2px solid var(--card);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-next {
+    flex: 2;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--accent), #7c3aff);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-next:hover { opacity: 0.9; }
+  .btn-next:active { transform: scale(0.98); }
+
+  /* Scoreboard */
+  .scoreboard {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .scoreboard h3 {
+    font-size: 0.8rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.1em; font-weight: 700; margin-bottom: 12px;
+  }
+
+  .sb-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .sb-row:last-child { border-bottom: none; }
+
+  .sb-name { flex: 1; font-weight: 700; font-size: 0.95rem; }
+  .sb-rounds { display: flex; gap: 6px; }
+  .sb-r {
+    min-width: 36px; text-align: center;
+    font-size: 0.82rem; color: var(--muted); font-weight: 600;
+  }
+  .sb-r.has-score { color: var(--text); }
+  .sb-total { font-weight: 800; font-size: 1rem; color: var(--gold); min-width: 40px; text-align: right; }
+
+  /* Results screen */
+  #results-screen { max-width: 420px; margin: 0 auto; }
+
+  .result-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  .winner-banner {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .winner-emoji { font-size: 3rem; margin-bottom: 8px; }
+
+  .winner-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .winner-score { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+  .rankings { display: flex; flex-direction: column; gap: 8px; }
+
+  .rank-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border-radius: 10px; padding: 12px 14px;
+  }
+
+  .rank-pos { font-size: 1.2rem; font-weight: 800; min-width: 28px; }
+  .rank-name { flex: 1; font-weight: 700; }
+  .rank-rounds { font-size: 0.8rem; color: var(--muted); margin-right: 8px; }
+  .rank-total { font-weight: 800; font-size: 1.1rem; color: var(--gold); }
+
+  /* Player color palette */
+  .p0 { background: #5ba4ff; color: #000; }
+  .p1 { background: #58e09a; color: #000; }
+  .p2 { background: #ffd166; color: #000; }
+  .p3 { background: #ff9a45; color: #000; }
+  .p4 { background: #ff5c7a; color: #fff; }
+
+  .hidden { display: none !important; }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+  .pop { animation: pop 0.2s ease; }
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP SCREEN ══ -->
+<div id="setup-screen">
+  <h1>✨ Pixies</h1>
+  <p class="subtitle">Compteur de points — 3 manches</p>
+
+  <div class="setup-card">
+    <h2>Nombre de joueurs</h2>
+    <div class="player-count-row">
+      <button class="count-btn" onclick="setCount(2)">2</button>
+      <button class="count-btn active" onclick="setCount(3)">3</button>
+      <button class="count-btn" onclick="setCount(4)">4</button>
+      <button class="count-btn" onclick="setCount(5)">5</button>
+    </div>
+
+    <h2>Noms des joueurs</h2>
+    <div class="player-inputs" id="player-inputs"></div>
+
+    <button class="btn-primary" onclick="startGame()">▶ Commencer la partie</button>
+  </div>
+</div>
+
+<!-- ══ GAME SCREEN ══ -->
+<div id="game-screen" class="hidden">
+  <h1>✨ Pixies</h1>
+
+  <div class="round-indicator" id="round-indicator"></div>
+
+  <div class="zone-hint" id="zone-hint">
+    🎨 <div>Zone de couleur : <strong id="zone-pts">2 pts</strong> par carte cette manche</div>
+  </div>
+
+  <div class="players-grid" id="players-grid"></div>
+
+  <div class="scoreboard" id="scoreboard">
+    <h3>Tableau des scores</h3>
+    <div id="sb-body"></div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-secondary" onclick="confirmReset()">↺ Recommencer</button>
+    <button class="btn-next" id="next-btn" onclick="nextRound()">Manche suivante →</button>
+  </div>
+</div>
+
+<!-- ══ RESULTS SCREEN ══ -->
+<div id="results-screen" class="hidden">
+  <h1>✨ Pixies</h1>
+  <p class="subtitle">Résultats finaux</p>
+
+  <div class="result-card fade-in">
+    <div class="winner-banner" id="winner-banner"></div>
+    <div class="rankings" id="rankings"></div>
+  </div>
+
+  <button class="btn-primary" onclick="newGame()">✨ Nouvelle partie</button>
+</div>
+
+<script>
+const PLAYER_COLORS = ['p0','p1','p2','p3','p4'];
+const ZONE_PTS = [2, 3, 4]; // per round
+
+let state = {
+  playerCount: 3,
+  names: ['Joueur 1','Joueur 2','Joueur 3','Joueur 4','Joueur 5'],
+  currentRound: 0, // 0-indexed
+  scores: [], // [player][round] = {validated, spirals, crosses, zone} or null
+};
+
+/* ── Setup ── */
+function setCount(n) {
+  state.playerCount = n;
+  document.querySelectorAll('.count-btn').forEach((b,i) => {
+    b.classList.toggle('active', i+2 === n);
+  });
+  renderPlayerInputs();
+}
+
+function renderPlayerInputs() {
+  const el = document.getElementById('player-inputs');
+  el.innerHTML = '';
+  for (let i = 0; i < state.playerCount; i++) {
+    el.innerHTML += `
+      <div class="player-input-row">
+        <div class="player-dot ${PLAYER_COLORS[i]}">${i+1}</div>
+        <input type="text" id="name-${i}" value="${state.names[i]}" placeholder="Joueur ${i+1}">
+      </div>`;
+  }
+}
+
+function startGame() {
+  for (let i = 0; i < state.playerCount; i++) {
+    const v = document.getElementById(`name-${i}`).value.trim();
+    state.names[i] = v || `Joueur ${i+1}`;
+  }
+  // init scores
+  state.scores = Array.from({length: state.playerCount}, () => [null, null, null]);
+  state.currentRound = 0;
+  document.getElementById('setup-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  renderGame();
+}
+
+/* ── Game ── */
+function renderGame() {
+  const r = state.currentRound;
+  // Round pips
+  const ri = document.getElementById('round-indicator');
+  ri.innerHTML = `<span class="round-label">Manche</span>`;
+  for (let i = 0; i < 3; i++) {
+    const cls = i < r ? 'done' : i === r ? 'active' : '';
+    ri.innerHTML += `<div class="round-pip ${cls}">${i+1}</div>`;
+  }
+
+  // Zone hint
+  document.getElementById('zone-pts').textContent = `${ZONE_PTS[r]} pts`;
+
+  // Next button label
+  const nb = document.getElementById('next-btn');
+  nb.textContent = r < 2 ? `Manche ${r+2} →` : '🏆 Résultats finaux';
+
+  // Player cards
+  const pg = document.getElementById('players-grid');
+  pg.innerHTML = '';
+  for (let p = 0; p < state.playerCount; p++) {
+    pg.innerHTML += buildPlayerCard(p, r);
+  }
+
+  renderScoreboard();
+}
+
+function buildPlayerCard(p, r) {
+  const s = state.scores[p][r] || {validated:0, spirals:0, crosses:0, zone:0};
+  return `
+    <div class="player-score-card fade-in" id="card-${p}">
+      <div class="player-header">
+        <div class="player-dot ${PLAYER_COLORS[p]}">${p+1}</div>
+        <span class="player-name-display">${state.names[p]}</span>
+        <div class="total-badge" id="total-${p}">${getGrandTotal(p)} pts</div>
+      </div>
+      <div class="score-inputs">
+        <div class="score-field">
+          <div class="score-label"><span class="icon">🃏</span> Cartes validées</div>
+          <input class="score-num-input" type="number" min="0" id="val-${p}"
+            value="${s.validated}" oninput="updateTotal(${p})">
+        </div>
+        <div class="score-field">
+          <div class="score-label"><span class="icon">🌀</span> Spirales</div>
+          <input class="score-num-input" type="number" min="0" id="spi-${p}"
+            value="${s.spirals}" oninput="updateTotal(${p})">
+        </div>
+        <div class="score-field">
+          <div class="score-label"><span class="icon">✖️</span> Croix (−)</div>
+          <input class="score-num-input" type="number" min="0" id="cro-${p}"
+            value="${s.crosses}" oninput="updateTotal(${p})">
+        </div>
+      </div>
+      <div class="score-field" style="margin-top:10px">
+        <div class="score-label"><span class="icon">🎨</span> Cartes dans votre plus grande zone de couleur</div>
+        <input class="score-num-input" type="number" min="0" id="zon-${p}"
+          value="${s.zone}" oninput="updateTotal(${p})" style="max-width:120px">
+      </div>
+      <div class="round-subtotal">Score manche : <span id="rsub-${p}">${calcRoundScore(s, r)}</span> pts</div>
+    </div>`;
+}
+
+function readPlayerInputs(p) {
+  const r = state.currentRound;
+  const validated = parseInt(document.getElementById(`val-${p}`)?.value) || 0;
+  const spirals   = parseInt(document.getElementById(`spi-${p}`)?.value) || 0;
+  const crosses   = parseInt(document.getElementById(`cro-${p}`)?.value) || 0;
+  const zone      = parseInt(document.getElementById(`zon-${p}`)?.value) || 0;
+  return {validated, spirals, crosses, zone};
+}
+
+function calcRoundScore(s, r) {
+  return s.validated + s.spirals - s.crosses + s.zone * ZONE_PTS[r];
+}
+
+function updateTotal(p) {
+  const r = state.currentRound;
+  const s = readPlayerInputs(p);
+  state.scores[p][r] = s;
+  const rs = calcRoundScore(s, r);
+  const el = document.getElementById(`rsub-${p}`);
+  if (el) el.textContent = rs;
+  const tel = document.getElementById(`total-${p}`);
+  if (tel) { tel.textContent = `${getGrandTotal(p)} pts`; tel.classList.add('pop'); setTimeout(()=>tel.classList.remove('pop'),200); }
+  renderScoreboard();
+}
+
+function getGrandTotal(p) {
+  let t = 0;
+  for (let r = 0; r < 3; r++) {
+    const s = state.scores[p][r];
+    if (s) t += calcRoundScore(s, r);
+  }
+  return t;
+}
+
+function saveCurrentRound() {
+  const r = state.currentRound;
+  for (let p = 0; p < state.playerCount; p++) {
+    state.scores[p][r] = readPlayerInputs(p);
+  }
+}
+
+function nextRound() {
+  saveCurrentRound();
+  if (state.currentRound < 2) {
+    state.currentRound++;
+    renderGame();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } else {
+    showResults();
+  }
+}
+
+function renderScoreboard() {
+  const sb = document.getElementById('sb-body');
+  let html = '';
+  for (let p = 0; p < state.playerCount; p++) {
+    html += `<div class="sb-row">
+      <div class="player-dot ${PLAYER_COLORS[p]}" style="width:24px;height:24px;font-size:0.75rem">${p+1}</div>
+      <div class="sb-name">${state.names[p]}</div>
+      <div class="sb-rounds">`;
+    for (let r = 0; r < 3; r++) {
+      const s = state.scores[p][r];
+      const pts = s ? calcRoundScore(s, r) : '—';
+      html += `<div class="sb-r ${s?'has-score':''}">${pts}</div>`;
+    }
+    html += `</div><div class="sb-total">${getGrandTotal(p)}</div></div>`;
+  }
+  sb.innerHTML = html;
+}
+
+/* ── Results ── */
+function showResults() {
+  document.getElementById('game-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+
+  const ranked = Array.from({length: state.playerCount}, (_,p) => ({
+    p, name: state.names[p], total: getGrandTotal(p),
+    rounds: [0,1,2].map(r => { const s = state.scores[p][r]; return s ? calcRoundScore(s,r) : 0; })
+  })).sort((a,b) => b.total - a.total);
+
+  const winner = ranked[0];
+  document.getElementById('winner-banner').innerHTML = `
+    <div class="winner-emoji">🏆</div>
+    <div class="winner-name">${winner.name}</div>
+    <div class="winner-score">${winner.total} points au total</div>
+  `;
+
+  const MEDALS = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  const rk = document.getElementById('rankings');
+  rk.innerHTML = ranked.map((pl,i) => `
+    <div class="rank-row">
+      <div class="rank-pos">${MEDALS[i]}</div>
+      <div class="player-dot ${PLAYER_COLORS[pl.p]}" style="width:28px;height:28px;font-size:0.8rem">${pl.p+1}</div>
+      <div class="rank-name">${pl.name}</div>
+      <div class="rank-rounds">${pl.rounds.map((s,r)=>`M${r+1}: ${s}`).join(' · ')}</div>
+      <div class="rank-total">${pl.total}</div>
+    </div>`).join('');
+}
+
+/* ── Utilities ── */
+function confirmReset() {
+  if (confirm('Recommencer une nouvelle partie ?')) newGame();
+}
+
+function newGame() {
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.add('hidden');
+  document.getElementById('setup-screen').classList.remove('hidden');
+  state.currentRound = 0;
+}
+
+/* ── Init ── */
+setCount(3);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+</body>
+</html>
