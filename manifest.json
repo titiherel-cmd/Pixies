@@ -1,5 +1,5 @@
 {
-  "name": "Pixies — Score v3",
+  "name": "Pixies — Score",
   "short_name": "Pixies",
   "description": "Compteur de points pour le jeu de cartes Pixies",
   "start_url": "./index.html",
